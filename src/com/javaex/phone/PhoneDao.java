@@ -1,4 +1,4 @@
-package com.javaex.phone; //다오에는 println이 없으면 안됨
+package com.javaex.phone; //다오에는 println이 없어야함
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -71,7 +71,6 @@ public class PhoneDao {
 		
 		getConnect();
 		
-
 		try {
 		   
 		    // 3. SQL문 준비 / 바인딩 / 실행
@@ -82,7 +81,6 @@ public class PhoneDao {
 		    query +="		company ";
 		    query +=" FROM phone";	
 		 
-		    System.out.println(query);
 		    
 		    //바인딩
 		    pstmt = conn.prepareStatement(query);
@@ -115,7 +113,7 @@ public class PhoneDao {
 	
 	
 	//INSERT
-	public void phoneInsert(String Name, String Hp, String Company) {
+	public void phoneInsert(String name, String hp, String company) {
 	
 		getConnect();
 		int count = 0;
@@ -129,9 +127,9 @@ public class PhoneDao {
 		    pstmt = conn.prepareStatement(query);
 			
 		    //바인딩
-		    pstmt.setString(1, Name);
-		    pstmt.setString(2, Hp);
-		    pstmt.setString(3, Company);
+		    pstmt.setString(1, name);
+		    pstmt.setString(2, hp);
+		    pstmt.setString(3, company);
 		    
 		    //실행
 		    count = pstmt.executeUpdate();
@@ -149,7 +147,7 @@ public class PhoneDao {
 	}//INSERT END
 	
 	//UPDATE
-	public void phoneUpdate(int personId, String Name, String Hp, String Company) {
+	public void phoneUpdate(int personId, String name, String hp, String company) {
 
 		getConnect();
 		int count = 0;
@@ -165,9 +163,9 @@ public class PhoneDao {
 			
 			pstmt = conn.prepareStatement(query);
 			
-			pstmt.setString(1, Name);
-			pstmt.setString(2, Hp);
-			pstmt.setString(3, Company);
+			pstmt.setString(1, name);
+			pstmt.setString(2, hp);
+			pstmt.setString(3, company);
 			pstmt.setInt(4, personId);
 			
 			count = pstmt.executeUpdate();
@@ -215,6 +213,57 @@ public class PhoneDao {
 	
 	
 	//검색
+	public List<PersonVo> personSh(String keyword) {
+		List<PersonVo> keyList = new ArrayList<>();
+	
+			getConnect();
+		
+		try {
+		   
+		    // 3. SQL문 준비 / 바인딩 / 실행
+		    String query = "";
+		    query +="SELECT	person_id, ";
+		    query +="		name, ";
+		    query +="		hp, ";
+		    query +="		company ";
+		    query +=" FROM phone";
+		    query +=" WHERE name like ?" ;
+		    query +="    or hp like ?";
+		    query +="	 or company like ?";
+		 
+		    
+		    
+		    //바인딩
+		    pstmt = conn.prepareStatement(query);
+		    
+		    pstmt.setString(1, "%"+keyword+"%");
+		    pstmt.setString(2, "%"+keyword+"%");
+		    pstmt.setString(3, "%"+keyword+"%");
+		    
+		    //실행
+		    rs = pstmt.executeQuery();
+		    // 4.결과처리
+		    while (rs.next()) {
+		    	int personId = rs.getInt("person_id");
+		    	String Name = rs.getString("name");
+		    	String Hp = rs.getString("hp");
+		    	String Company = rs.getString("company");
+		    	
+		    	PersonVo personVo = new PersonVo(personId, Name, Hp, Company);
+		    	keyList.add(personVo);
+		    }
+		    
+		
+		} catch (SQLException e) {
+		    System.out.println("error:" + e);
+		} 
+
+			close();
+
+	
+			return keyList;
+	}
+	
 	//정보수정
 	
 		
